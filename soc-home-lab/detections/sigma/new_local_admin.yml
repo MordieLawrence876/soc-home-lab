@@ -1,0 +1,31 @@
+title: New Local Administrator Account Created
+id: SOC-LAB-002
+status: experimental
+description: |
+  Detects creation of a new local account immediately added to Administrators.
+  Common attacker persistence technique — creates a backdoor account.
+  MITRE: T1136.001 (Create Account: Local Account) | Tactic: Persistence
+author: Mordie Lawrence
+date: 2026-05-13
+
+logsource:
+  product: windows
+  service: security
+
+detection:
+  account_created:
+    EventID: 4720
+  added_to_admins:
+    EventID: 4732
+    TargetUserName: 'Administrators'
+  timeframe: 5m
+  condition: account_created and added_to_admins
+
+falsepositives:
+  - Legitimate IT provisioning windows
+  - Authorized helpdesk activity
+
+level: high
+tags:
+  - attack.persistence
+  - attack.t1136.001

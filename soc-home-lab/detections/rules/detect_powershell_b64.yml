@@ -1,0 +1,39 @@
+# Rule ID: SOC-LAB-001
+# Name: PowerShell Base64 Encoded Command Execution
+# MITRE: T1059.001 | Tactic: Execution
+# Author: Mordie Lawrence | Created: 2026-05-13
+#
+# WHY THIS RULE EXISTS:
+#   Attackers encode PowerShell payloads in Base64 to bypass simple
+#   string-matching defenses. The -EncodedCommand flag tells PowerShell
+#   to decode and run a Base64 string. Legitimate admins almost never
+#   use this in daily work, making it a high-signal detection.
+#
+# FALSE POSITIVES:
+#   - Enterprise deployment tools (SCCM, Intune) — whitelist by parent process
+#   - Developers testing locally — acceptable risk at low volume
+#
+# EVIDENCE TO COLLECT ON ALERT:
+#   1. Decode the Base64 string using CyberChef (gchq.github.io/CyberChef)
+#   2. Identify the parent process — was it Word? A browser? A script?
+#   3. Check for child processes (network connections, new files)
+#   4. Review the user account for anomalous login history
+#   5. Preserve the full process tree before clearing
+
+rule:
+  id: SOC-LAB-001
+  name: PowerShell Base64 Encoded Command Execution
+  severity: HIGH
+
+detection:
+  event_ids: [4688, 1]
+  conditions:
+    process: powershell.exe
+    command_line_contains: ["-enc ", "-EncodedCommand", "-ec "]
+  exclude:
+    parent_process: ["sccm.exe", "ccmexec.exe"]
+
+response:
+  - Decode Base64 payload in CyberChef immediately
+  - Map parent process chain
+  - Hunt for lateral movement or data exfil within +/- 10 minutes

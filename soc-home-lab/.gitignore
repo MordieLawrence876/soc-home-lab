@@ -1,0 +1,24 @@
+# Never commit these to GitHub
+*.log
+*.pcap
+*.evtx
+*.zip
+*.iso
+
+# API keys or credentials (should never be in a project like this)
+*.env
+secrets.txt
+credentials*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Keep completed IR reports but not draft working files
+incident-reports/drafts/
